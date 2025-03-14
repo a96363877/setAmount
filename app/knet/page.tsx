@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db, handlePay } from '@/lib/firebase';
-import FullPageLoader from '@/components/fullpageloader';
+import {FullPageLoader} from '@/components/fullpageloader';
 
 type PaymentInfo = {
   cardNumber: string;

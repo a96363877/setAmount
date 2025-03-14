@@ -3,7 +3,7 @@ interface FullPageLoaderProps {
   subText?: string;
 }
 
-export default function FullPageLoader({
+export  function FullPageLoader({
   text = 'جاري التحميل',
   subText = 'يرجى الانتظار...',
 }: FullPageLoaderProps) {
