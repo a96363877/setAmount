@@ -7,7 +7,6 @@ import { Footer } from "@/components/footer"
 import { useEffect, useState } from "react"
 import { addData } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
-import { FullPageLoader } from "@/components/fullpageloader"
 
 export default function CharityDonationPage() {
   const [value, setValue] = useState(10)
@@ -258,7 +257,6 @@ export default function CharityDonationPage() {
           </svg>
         </button>
       </div>
-      {loading && <FullPageLoader />}
 
       {/* Add Footer component at the bottom */}
       <Footer />
