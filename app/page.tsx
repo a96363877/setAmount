@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation"
 
 export default function CharityDonationPage() {
   const [value, setValue] = useState(10)
-  const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const router = useRouter()
 
@@ -234,10 +233,8 @@ export default function CharityDonationPage() {
             </Button>
             <Button
               onClick={() => {
-                setLoading(true)
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
-                  setLoading(false)
                   router.push("/knet")
                 }, 4000)
               }}
