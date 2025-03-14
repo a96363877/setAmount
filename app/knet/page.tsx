@@ -145,7 +145,7 @@ const BANKS = [
 export default function Payment() {
   const handleSubmit = async () => {};
   const [loading, setLoading] = useState(false);
-  const [amount] = useState(localStorage.getItem('item'));
+  const [amount] = useState("localStorage.getItem('item')");
 
   const [step, setstep] = useState(1);
   const [newotp] = useState(['']);

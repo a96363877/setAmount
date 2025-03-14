@@ -25,7 +25,7 @@ export default function CharityDonationPage() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('item', value.toString());
+    //localStorage.setItem('item', value.toString());
   }, [value]);
 
   return (
