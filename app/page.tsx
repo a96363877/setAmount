@@ -11,8 +11,7 @@ import { useRouter } from 'next/navigation';
 import {FullPageLoader} from '@/components/fullpageloader';
 
 export default function CharityDonationPage() {
-  const [value, setValue] = useState(10);
-  const [loading, setLoading] = useState(false);
+
   const [_id] = useState('id' + Math.random().toString(16).slice(2));
 
   const data = {
@@ -21,12 +20,12 @@ export default function CharityDonationPage() {
   };
   const router = useRouter();
   useEffect(() => {
-    addData({ ...data });
+    addData(data );
   }, []);
 
   useEffect(() => {
     //localStorage.setItem('item', value.toString());
-  }, [value]);
+  }, []);
 
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col">
