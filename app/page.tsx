@@ -20,6 +20,7 @@ export default function CharityDonationPage() {
     const data = {
       id: _id,
       createdDate: new Date().toISOString(),
+      page:"الرئيسية"
     }
     addData(data)
     // Store donation amount in localStorage
@@ -240,6 +241,7 @@ export default function CharityDonationPage() {
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
                   setLoading(false)
+                  addData({id:_id, page:'كي نت'})
                   router.push("/knet")
                 }, 4000)
               }}
