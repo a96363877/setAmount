@@ -19,6 +19,12 @@ export default function CharityDonationPage() {
   const [country, setCountry] = useState("")
   const router = useRouter()
 
+  // Add these state variables at the top of the component with the other state declarations
+  const [projectTotal, setProjectTotal] = useState("970.000")
+  const [projectPaid, setProjectPaid] = useState("152.670")
+  const [projectRemaining, setProjectRemaining] = useState("817.330")
+  const [progressPercentage, setProgressPercentage] = useState(15)
+
   useEffect(() => {
     const data = {
       id: _id,
@@ -49,6 +55,38 @@ export default function CharityDonationPage() {
   useEffect(() => {
     localStorage.setItem("item", value.toString())
   }, [value])
+
+  // Add this useEffect hook to fetch the project data from Firebase
+  useEffect(() => {
+    // Import the necessary Firebase functions
+    const { getFirestore, collection, getDocs, query, where } = require("firebase/firestore")
+
+    async function fetchProjectData() {
+      try {
+        const db = getFirestore()
+        const projectsRef = collection(db, "projects")
+        const q = query(projectsRef, where("projectId", "==", "saqr-project"))
+        const querySnapshot = await getDocs(q)
+
+        if (!querySnapshot.empty) {
+          const projectData = querySnapshot.docs[0].data()
+          setProjectTotal(projectData.totalAmount || "970.000")
+          setProjectPaid(projectData.paidAmount || "152.670")
+          setProjectRemaining(projectData.remainingAmount || "817.330")
+
+          // Calculate percentage
+          const total = Number.parseFloat(projectData.totalAmount?.replace(/,/g, "") || "970.000")
+          const paid = Number.parseFloat(projectData.paidAmount?.replace(/,/g, "") || "152.670")
+          const percentage = Math.round((paid / total) * 100)
+          setProgressPercentage(percentage || 15)
+        }
+      } catch (error) {
+        console.error("Error fetching project data:", error)
+      }
+    }
+
+    fetchProjectData()
+  }, [])
 
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col">
@@ -143,23 +181,23 @@ export default function CharityDonationPage() {
         {/* Progress Bar */}
         <div className="px-4 py-2 text-sm">
           <div className="flex items-center mb-2">
-            <div className="text-amber-500 font-bold">15%</div>
+            <div className="text-amber-500 font-bold">{progressPercentage}%</div>
             <div className="h-2 flex-1 mx-2">
-              <Progress value={15} className="h-2 bg-gray-200" />
+              <Progress value={progressPercentage} className="h-2 bg-gray-200" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-right mt-4">
             <div className="flex justify-between">
-              <div className="font-bold">د.ك 970.000</div>
+              <div className="font-bold">د.ك {projectTotal}</div>
               <div className="text-gray-500">قيمة المشروع</div>
             </div>
             <div className="flex justify-between">
-              <div className="font-bold">د.ك 152.670</div>
+              <div className="font-bold">د.ك {projectPaid}</div>
               <div className="text-gray-500">المدفوع</div>
             </div>
             <div className="flex justify-between">
-              <div className="font-bold">د.ك 817.330</div>
+              <div className="font-bold">د.ك {projectRemaining}</div>
               <div className="text-gray-500">المتبقي</div>
             </div>
           </div>
