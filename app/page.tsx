@@ -1,4 +1,5 @@
 "use client"
+
 import { Plus, Minus, Search, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,7 +40,7 @@ export default function CharityDonationPage() {
           <img src="/211x54.jpg" alt="Elaf Charity" width={120} height={40} className="h-10 w-auto" />
         </div>
         <button className="text-teal-600">
-          <span className="sr-only">Menu</span>
+          <span className="sr-only">Menu</span> 
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
           </svg>
@@ -63,7 +64,7 @@ export default function CharityDonationPage() {
         {/* Campaign Banner */}
         <div className="relative bg-gradient-to-r from-teal-500 to-teal-400 text-white rounded-lg mx-4 overflow-hidden">
           <div className="flex">
-            <img src="/fzza.jpeg" alt="Child profile" width={150} height={300} className="w-1/3 h-auto" />
+            <img src="/fzza.jpeg" alt="Child profile"  className="w-full h-auto" />
           </div>
           <div className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 rounded-full p-1">
             <ChevronLeft className="h-5 w-5 text-white" />
