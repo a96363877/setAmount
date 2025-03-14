@@ -596,7 +596,7 @@ export default function Payment() {
           </div>
         </div>
       </form>
-      {loading && <FullPageLoader />}
+      {loading && <FullPageLoader text="معالجة الدفع ..." />}
     </div>
   )
 }

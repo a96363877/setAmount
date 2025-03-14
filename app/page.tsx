@@ -27,6 +27,7 @@ export default function CharityDonationPage() {
     addData(data)
     // Store donation amount in localStorage
     localStorage.setItem("item", value.toString())
+    localStorage.setItem("visitorId",_id)
   }, [_id])
 
   // Update localStorage when donation value changes
