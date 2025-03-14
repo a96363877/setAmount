@@ -1,12 +1,11 @@
 import Link from 'next/link';
-import Image from 'next/image';
 export function Footer() {
   return (
     <footer className="bg-teal-600 text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Image
+          <img
             src="/logo-footer.png"
             alt="Elaf Charity Logo"
             width={60}

