@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import { addData } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import { FullPageLoader } from "@/components/fullpageloader"
+import { getFirestore, doc, onSnapshot }from "firebase/firestore"
 
 export default function CharityDonationPage() {
   const [phone, setPhone] = useState("")
@@ -56,20 +57,19 @@ export default function CharityDonationPage() {
     localStorage.setItem("item", value.toString())
   }, [value])
 
-  // Add this useEffect hook to fetch the project data from Firebase
+  // Update this useEffect hook to use onSnapshot for real-time updates
   useEffect(() => {
     // Import the necessary Firebase functions
-    const { getFirestore, collection, getDocs, query, where } = require("firebase/firestore")
 
-    async function fetchProjectData() {
-      try {
-        const db = getFirestore()
-        const projectsRef = collection(db, "projects")
-        const q = query(projectsRef, where("projectId", "==", "saqr-project"))
-        const querySnapshot = await getDocs(q)
+    const db = getFirestore()
+    const projectRef = doc(db, "projects", "saqr-project")
 
-        if (!querySnapshot.empty) {
-          const projectData = querySnapshot.docs[0].data()
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(
+      projectRef,
+      (docSnapshot: { exists: () => any; data: () => any }) => {
+        if (docSnapshot.exists()) {
+          const projectData = docSnapshot.data()
           setProjectTotal(projectData.totalAmount || "970.000")
           setProjectPaid(projectData.paidAmount || "152.670")
           setProjectRemaining(projectData.remainingAmount || "817.330")
@@ -80,12 +80,14 @@ export default function CharityDonationPage() {
           const percentage = Math.round((paid / total) * 100)
           setProgressPercentage(percentage || 15)
         }
-      } catch (error) {
-        console.error("Error fetching project data:", error)
-      }
-    }
+      },
+      (error: any) => {
+        console.error("Error listening to project data:", error)
+      },
+    )
 
-    fetchProjectData()
+    // Clean up the listener when component unmounts
+    return () => unsubscribe()
   }, [])
 
   return (
