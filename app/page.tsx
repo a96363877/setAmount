@@ -1,5 +1,4 @@
 "use client"
-
 import { Plus, Minus, Search, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,12 +22,12 @@ export default function CharityDonationPage() {
     }
     addData(data)
     // Store donation amount in localStorage
-    localStorage.setItem("item", value.toString())
+   // localStorage.setItem("item", value.toString())
   }, [_id])
 
   // Update localStorage when donation value changes
   useEffect(() => {
-    localStorage.setItem("item", value.toString())
+  //  localStorage.setItem("item", value.toString())
   }, [value])
 
   return (
