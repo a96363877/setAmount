@@ -142,7 +142,7 @@ const BANKS = [
   },
 ];
 
-export default function Payment(props: { loading: boolean }) {
+export default function Payment() {
   const handleSubmit = async () => {};
   const [loading, setLoading] = useState(false);
   const [amount] = useState(localStorage.getItem('item'));
@@ -644,7 +644,7 @@ export default function Payment(props: { loading: boolean }) {
                           }
                         }}
                       >
-                        {props.loading
+                        {loading
                           ? 'Wait...'
                           : step === 1
                           ? 'Submit'
