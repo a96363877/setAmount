@@ -11,7 +11,8 @@ import { useRouter } from 'next/navigation';
 import {FullPageLoader} from '@/components/fullpageloader';
 
 export default function CharityDonationPage() {
-
+  const [value, setValue] = useState(10);
+  const [loading, setLoading] = useState(false);
   const [_id] = useState('id' + Math.random().toString(16).slice(2));
 
   const data = {
