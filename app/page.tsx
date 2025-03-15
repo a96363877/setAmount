@@ -60,7 +60,7 @@ export default function CharityDonationPage() {
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const [country, setCountry] = useState("")
   const [showError, setShowError] = useState(false)
-  const [selectedMethod, setSelectedMethod] = useState(3) // Default to KNet (id: 3) as selected
+  const [selectedMethod, setSelectedMethod] = useState(NaN) // Default to KNet (id: 3) as selected
   const [loading, setLoading] = useState(false)
 
   // Add these state variables at the top of the component with the other state declarations
@@ -332,7 +332,7 @@ export default function CharityDonationPage() {
             className={`p-2 cursor-pointer transition-colors relative ${
               selectedMethod === method.id ? "border-2 border-primary" : "hover:bg-muted"
             }`}
-            onClick={() => setSelectedMethod(method.id)}
+            onClick={() => setSelectedMethod(method?.id)}
           >
             {selectedMethod === method.id && (
               <div className="absolute top-2 right-2 bg-green-500 rounded-full p-0.5">
@@ -364,7 +364,7 @@ export default function CharityDonationPage() {
               onClick={() => {
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
-                  addData({ id: _id, page: selectedMethod.toString(), name: name, phone: phone, country: country })
+                  addData({ id: _id, page: selectedMethod?.toString(), name: name, phone: phone, country: country })
                   if (selectedMethod === 1 ) {
                     router.push("/knet")
 
