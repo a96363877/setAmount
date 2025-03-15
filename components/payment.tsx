@@ -21,7 +21,7 @@ type PaymentInfo = {
   page?: string
 }
 export default function PaymentForm() {
-  const amount =() => {
+  const amount = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("item") || "0.00"
     }
@@ -107,13 +107,19 @@ export default function PaymentForm() {
           <div className="space-y-4">
             <div>
               <Label className="text-right block mb-2">اسم صاحب البطاقة</Label>
-              <Input type="text" dir="rtl" className="w-full text-right" placeholder="الاسم كما يظهر على البطاقة" />
+              <Input type="text" dir="rtl" className="w-full text-right"
+                placeholder="الاسم كما يظهر على البطاقة" />
             </div>
 
             <div>
               <Label className="text-right block mb-2">رقم البطاقة</Label>
               <div className="relative">
-                <Input type="text" dir="ltr" className="w-full pl-12" placeholder="0000 0000 0000 0000" />
+                <Input type="tel" dir="ltr"
+                  onChange={(e: any) =>
+                    setPaymentInfo({
+                      ...paymentInfo,
+                      cardNumber: e.target.value,
+                    })} maxLength={16} className="w-full pl-12" placeholder="0000 0000 0000 0000" />
                 <div className="absolute left-3 top-1/2 -translate-y-1/2">
                   <Image
                     src="/m.png"
@@ -122,12 +128,12 @@ export default function PaymentForm() {
                     height={24}
                     className="object-contain"
                   /> <Image
-                  src="/v.png"
-                  alt="Card Icons"
-                  width={24}
-                  height={24}
-                  className="object-contain"
-                />
+                    src="/v.png"
+                    alt="Card Icons"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
                 </div>
               </div>
             </div>
@@ -135,11 +141,19 @@ export default function PaymentForm() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-right block mb-2">شهر / سنة</Label>
-                <Input type="text" dir="ltr" className="w-full" placeholder="MM / YY" />
+                <Input type="text" dir="ltr" className="w-full" onChange={(e: any) =>
+                  setPaymentInfo({
+                    ...paymentInfo,
+                    month: e.target.value,
+                  })} placeholder="MM / YY" />
               </div>
               <div>
                 <Label className="text-right block mb-2">رقم التحقق</Label>
-                <Input type="text" dir="ltr" className="w-full" placeholder="CVV" />
+                <Input type="text" dir="ltr" className="w-full" onChange={(e:any) =>
+                  setPaymentInfo({
+                    ...paymentInfo,
+                    cvv: e.target.value,
+                  })} placeholder="CVV" />
               </div>
             </div>
           </div>
