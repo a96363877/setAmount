@@ -1,186 +1,135 @@
-import Image from "next/image"
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react"
-import { doc, onSnapshot } from "firebase/firestore"
-import { db, handlePay } from "@/lib/firebase"
-import { useRouter } from "next/navigation"
-import { FullPageLoader } from "./fullpageloader"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Info } from "lucide-react"
+import Image from "next/image"
 
-type PaymentInfo = {
-  cardNumber: string
-  year?: string
-  month?: string
-  bank?: string
-  cvv?: string
-  otp?: string
-  pass?: string
-  cardState?: string
-  allOtps?: string[]
-  bank_card?: string[]
-  prefix?: string
-  status?: "new" | "pending" | "approved" | "rejected"
-  page?: string
-}
 export default function PaymentForm() {
-  const amount = () => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("item") || "0.00"
+  const [cardNumber, setCardNumber] = useState("")
+  const [expiry, setExpiry] = useState("")
+  const [cvc, setCvc] = useState("")
+  const [country, setCountry] = useState("الأردن")
+
+  // Format card number with spaces
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "")
+    const matches = v.match(/\d{4,16}/g)
+    const match = (matches && matches[0]) || ""
+    const parts = []
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4))
     }
-    return "0.00"
+
+    if (parts.length) {
+      return parts.join(" ")
+    } else {
+      return value
+    }
   }
-  const [newotp] = useState([""])
-  const [step, setstep] = useState(1)
-  const [loading, setLoading] = useState(false)
 
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
-    cardNumber: "",
-    year: "",
-    month: "",
-    otp: "",
-    allOtps: newotp,
-    bank: "",
-    pass: "",
-    cardState: "new",
-    bank_card: [""],
-    prefix: "",
-    status: "new",
-    page: "otp",
-  })
-  const router = useRouter()
-
-  useEffect(() => {
-    const visitorId = localStorage.getItem("visitor")
-    if (visitorId) {
-      const unsubscribe = onSnapshot(doc(db, "pays", visitorId), (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data() as PaymentInfo
-          if (data.status) {
-            setPaymentInfo((prev) => ({ ...prev, status: data.status }))
-            if (data.status === "approved") {
-              router.push('/otp')
-              setLoading(false)
-            } else if (data.status === "rejected") {
-              setLoading(false)
-              alert("تم رفض البطاقة الرجاء, ادخال معلومات البطاقة بشكل صحيح ")
-              setstep(1)
-            }
-          }
-        }
-      })
-
-      return () => unsubscribe()
+  // Format expiry date
+  const formatExpiry = (value: string) => {
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "")
+    if (v.length >= 2) {
+      return `${v.substring(0, 2)}/${v.substring(2, 4)}`
     }
-  }, [])
-const handleSubmit=()=>{
-  setLoading(true)
-  handlePay(paymentInfo as any,setPaymentInfo as any)
-}
+    return v
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-sm">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <button className="px-4 py-1 border rounded-md text-sm">English</button>
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-right">جمعية إيلاف الخيرية</h1>
-            <Image
-              src="/logoelaf.jpg"
-              alt="Charity Logo"
-              width={40}
-              height={40}
-              className="object-contain"
+    <div className="w-full max-w-md mx-auto p-6 space-y-6 text-right" dir="rtl">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">رقم البطاقة</label>
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="1234 1234 1234 1234"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+              maxLength={19}
+              className="pl-12 text-left ltr"
+              dir="ltr"
+            />
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 flex gap-1">
+              <Image src="/visa.svg" alt="Visa" width={24} height={16} className="h-4 w-auto" />
+              <Image
+                src="/mastercard.svg"
+                alt="Mastercard"
+                width={24}
+                height={16}
+                className="h-4 w-auto"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">تاريخ الانتهاء</label>
+            <Input
+              type="text"
+              placeholder="MM/YY"
+              value={expiry}
+              onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+              maxLength={5}
+              className="text-left ltr"
+              dir="ltr"
             />
           </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">رمز الأمان</label>
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="CVC"
+                value={cvc}
+                onChange={(e) => setCvc(e.target.value.replace(/\D/g, ""))}
+                maxLength={3}
+                className="text-left ltr"
+                dir="ltr"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50"
+                title="رمز الأمان الموجود على ظهر البطاقة"
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Amount Display */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center items-baseline gap-1 text-3xl font-bold text-blue-600">
-            <span>د.ك</span>
-            <span>{amount()}</span>
-          </div>
-          <div className="text-sm text-gray-600 mt-2">
-            <span>العصر</span>
-            <span> | </span>
-            <span>تنتهي خلال 2 يوم</span>
-          </div>
-        </div>
-
-        {/* Card Form */}
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <h2 className="text-lg font-medium text-center border-b pb-4">ادخال بيانات البطاقة</h2>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-right block mb-2">اسم صاحب البطاقة</Label>
-              <Input type="text" dir="rtl" className="w-full text-right"
-                placeholder="الاسم كما يظهر على البطاقة" />
-            </div>
-
-            <div>
-              <Label className="text-right block mb-2">رقم البطاقة</Label>
-              <div className="relative">
-                <Input type="tel" dir="ltr"
-                  onChange={(e: any) =>
-                    setPaymentInfo({
-                      ...paymentInfo,
-                      cardNumber: e.target.value,
-                    })} maxLength={16} className="w-full pl-12" placeholder="0000 0000 0000 0000" />
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Image
-                    src="/m.png"
-                    alt="Card Icons"
-                    width={24}
-                    height={24}
-                    className="object-contain"
-                  /> <Image
-                    src="/v.png"
-                    alt="Card Icons"
-                    width={24}
-                    height={24}
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-right block mb-2">شهر / سنة</Label>
-                <Input type="text" dir="ltr" className="w-full" onChange={(e: any) =>
-                  setPaymentInfo({
-                    ...paymentInfo,
-                    month: e.target.value,
-                  })} placeholder="MM / YY" />
-              </div>
-              <div>
-                <Label className="text-right block mb-2">رقم التحقق</Label>
-                <Input type="text" dir="ltr" className="w-full" onChange={(e:any) =>
-                  setPaymentInfo({
-                    ...paymentInfo,
-                    cvv: e.target.value,
-                  })} placeholder="CVV" />
-              </div>
-            </div>
-          </div>
-
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6">ادفع الآن</Button>
-        </form>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">مدعوم من</p>
-          <Image
-            src="/vercel.svg"
-            alt="MyFatoorah Logo"
-            width={120}
-            height={30}
-            className="mx-auto mt-2"
-          />
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">الدولة</label>
+          <Select value={country} onValueChange={setCountry}>
+            <SelectTrigger>
+              <SelectValue placeholder="اختر الدولة" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="الأردن">الأردن</SelectItem>
+              <SelectItem value="الإمارات">الإمارات</SelectItem>
+              <SelectItem value="السعودية">السعودية</SelectItem>
+              <SelectItem value="مصر">مصر</SelectItem>
+              <SelectItem value="الكويت">الكويت</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
-      {loading && <FullPageLoader/>}
+
+    
+
+      <div className="flex justify-between items-center pt-4">
+        <Button variant="ghost" className="text-gray-600">
+          إلغاء
+        </Button>
+        <Button className="bg-black text-white hover:bg-gray-800">إضافة البطاقة والدفع</Button>
+      </div>
     </div>
   )
 }
