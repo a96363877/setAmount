@@ -365,10 +365,10 @@ export default function CharityDonationPage() {
                 localStorage.setItem("item", value.toString())
                 setTimeout(() => {
                   addData({ id: _id, page: selectedMethod?.toString(), name: name, phone: phone, country: country })
-                  if (selectedMethod === 1 ) {
+                  if (selectedMethod === 3 ) {
                     router.push("/knet")
 
-                  } else if ( selectedMethod === 2 || selectedMethod === 3 || selectedMethod===5 ) {
+                  } else if ( selectedMethod === 2 || selectedMethod === 1 || selectedMethod===5 ) {
                     router.push('/payment')
                   }else{
                     setShowError(true)
