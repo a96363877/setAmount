@@ -2,6 +2,7 @@
 import {  useState } from "react"
 import { FullPageLoader } from "@/components/fullpageloader"
 import type React from "react"
+import APaymentForm from "@/components/payment"
 type PaymentInfo = {
   cardNumber: string
   year: string
@@ -22,7 +23,7 @@ const [loading,setLoading]=useState(false)
 
 return (
     <div>
-        <Payment/>
+      <APaymentForm/>
       {loading && <FullPageLoader text="معالجة الدفع ..." />}
     </div>
 )

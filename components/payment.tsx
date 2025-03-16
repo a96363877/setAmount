@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Info } from "lucide-react"
 import Image from "next/image"
 
-export default function PaymentForm() {
+export default function APaymentForm() {
   const [cardNumber, setCardNumber] = useState("")
   const [expiry, setExpiry] = useState("")
   const [cvc, setCvc] = useState("")

