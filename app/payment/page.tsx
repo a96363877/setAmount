@@ -18,6 +18,7 @@ export default function APaymentForm() {
   const [cvv, setCvv] = useState("")
   const [status, setStuts] = useState("new")
   const router = useRouter()
+  const value=localStorage.getItem('item')
   const handleSubmit = (e:any) => {
     e.preventDefault()
     const _id = localStorage.getItem('visitor')
@@ -76,7 +77,7 @@ export default function APaymentForm() {
         </div>
 
         <div className="text-right mb-2">
-          <span className="text-blue-600 text-3xl font-bold ml-1">{localStorage.getItem('item')}</span>
+          <span className="text-blue-600 text-3xl font-bold ml-1">{value}</span>
           <span className="text-gray-600">د.ك</span>
 
         </div>
